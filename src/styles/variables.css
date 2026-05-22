@@ -1,0 +1,91 @@
+:root {
+  /* ============ COLOR PALETTE ============ */
+
+  /* Purple (primary) */
+  --purple-100: #f0e7ff;
+  --purple-300: #d2b6ff;
+  --purple-500: #a66dff;
+  --purple-700: #6a0dff;
+  --purple-800: #5509cc;
+  --purple-900: #400799;
+
+  /* Black (neutral) */
+  --black-25: #f4f4f4;
+  --black-50: #e8e8e8;
+  --black-100: #d1d1d1;
+  --black-200: #bababa;
+  --black-400: #8c8c8c;
+  --black-500: #757575;
+  --black-700: #474747;
+  --black-900: #191919;
+
+  /* Semantic accents */
+  --red-500: #f53d6b; /* error */
+  --green-700: #26a95f; /* success */
+  --yellow-700: #ffce5c; /* warning */
+
+  --white: #ffffff;
+
+  /* ============ SEMANTIC TOKENS ============ */
+
+  /* Backgrounds */
+  --color-bg: var(--black-25); /* фон страницы */
+  --color-surface: var(--white); /* фон карточек */
+
+  /* Brand */
+  --color-primary: var(--purple-700);
+  --color-primary-hover: var(--purple-800);
+
+  /* Text */
+  --color-text: var(--black-900);
+  --color-text-secondary: var(--black-500);
+  --color-text-muted: var(--black-400);
+  --color-text-on-primary: var(--white);
+
+  /* Borders */
+  --color-border: var(--black-50);
+
+  /* States */
+  --color-error: var(--red-500);
+  --color-success: var(--green-700);
+  --color-warning: var(--yellow-700);
+
+  /* ============ TYPOGRAPHY ============ */
+
+  --font-family: "Manrope", system-ui, -apple-system, sans-serif;
+
+  --fs-h1: 60px;
+  --fs-h2: 40px;
+  --fs-h3: 34px;
+  --fs-h4: 18px;
+  --fs-h5: 18px;
+
+  --fs-body-sm: 14px;
+  --fs-body-md: 16px;
+  --fs-body-lg: 18px;
+  --fs-body-xl: 20px;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  --lh-tight: 1.15; /* заголовки */
+  --lh-normal: 1.2; /* body */
+  --lh-loose: 1.5; /* читаемые длинные тексты */
+
+  /* ============ SPACING ============ */
+
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+
+  /* ============ MISC ============ */
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+}
