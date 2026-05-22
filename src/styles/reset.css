@@ -1,0 +1,61 @@
+/* Box sizing — чтобы padding и border не увеличивали размер элемента */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Убираем дефолтные отступы у всех блочных элементов */
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+figure,
+blockquote,
+ul,
+ol,
+dl {
+  margin: 0;
+  padding: 0;
+}
+
+/* Убираем точки/цифры у списков */
+ul,
+ol {
+  list-style: none;
+}
+
+/* Базовые правила для body */
+body {
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Картинки не вылезают за контейнер */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* Кнопки наследуют шрифт от родителя (по умолчанию браузер ставит свой) */
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+/* Убираем подчёркивание у ссылок (стилизуем сами при необходимости) */
+a {
+  color: inherit;
+  text-decoration: none;
+}
