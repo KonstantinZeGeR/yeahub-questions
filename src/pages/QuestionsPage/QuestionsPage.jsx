@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getQuestions } from "../../api/questions/getQuestions";
+import { QuestionsList } from "../../features/QuestionsList/QuestionsList";
 
 export function QuestionsPage() {
   const [questions, setQuestions] = useState([]);
@@ -32,11 +33,7 @@ export function QuestionsPage() {
     <div>
       <h1>Вопросы</h1>
       <p>Всего загружено: {questions.length}</p>
-      <ul>
-        {questions.map(({ id, title }) => (
-          <li key={id}>{title}</li>
-        ))}
-      </ul>
+      <QuestionsList questions={questions} />
     </div>
   );
 }

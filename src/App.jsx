@@ -1,7 +1,5 @@
 import { QuestionsPage } from "./pages/QuestionsPage/QuestionsPage";
 
-function App() {
+export function App() {
   return <QuestionsPage />;
 }
-
-export default App;
