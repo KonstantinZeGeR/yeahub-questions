@@ -1,9 +1,5 @@
-function App() {
-  return (
-    <>
-      <h1>YeaHub Questions</h1>
-    </>
-  );
-}
+import { QuestionsPage } from "./pages/QuestionsPage/QuestionsPage";
 
-export default App;
+export function App() {
+  return <QuestionsPage />;
+}
