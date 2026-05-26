@@ -1,8 +1,13 @@
-export function QuestionCard({ description, title }) {
+import styles from './QuestionCard.module.css'
+
+export function QuestionCard({ title, description }) {
   return (
-    <article>
-      <h2>{title}</h2>
-      <p>{description}</p>
+    <article className={styles.card}>
+      <div className={styles.header}>
+        <h2 className={styles.title}>{title}</h2>
+        <span className={styles.arrow}>∨</span>
+      </div>
+      <p className={styles.description}>{description}</p>
     </article>
-  );
+  )
 }

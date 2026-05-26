@@ -1,0 +1,27 @@
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.title {
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-bold);
+  margin-bottom: 24px;
+}
+
+.subtitle {
+  font-size: var(--fs-body-md);
+  color: var(--color-text-secondary);
+  margin-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: var(--fs-h3);
+  }
+  
+  .page {
+    padding: 24px 16px;
+  }
+}
