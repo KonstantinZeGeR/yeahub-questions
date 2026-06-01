@@ -1,10 +1,12 @@
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URL;
 
-export async function getQuestions() {
-  const response = await fetch(`${API_URL}/questions/public-questions`)
+export async function getQuestions({page = 1, limit = 10} = {}) {
+  const params = new URLSearchParams({ page, limit });
+
+  const response = await fetch(`${API_URL}/questions/public-questions?${params}`);
   if (!response.ok) {
-    throw new Error(`Error: ${response.status}`)
+    throw new Error(`Error: ${response.status}`);
   }
-  const data = await response.json()
-  return data
+  const data = await response.json();
+  return data;
 }
