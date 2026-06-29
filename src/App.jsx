@@ -1,11 +1,6 @@
-import { Header } from "./components/Header/Header";
-import { QuestionsPage } from "./pages/QuestionsPage/QuestionsPage";
+import { RouterProvider } from "react-router-dom";
+import { router } from "./router";
 
 export function App() {
-  return (
-    <>
-      <Header />
-      <QuestionsPage />
-    </>
-  );
+  return <RouterProvider router={router} />
 }
