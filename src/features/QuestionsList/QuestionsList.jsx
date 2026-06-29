@@ -6,7 +6,7 @@ export function QuestionsList({ questions }) {
     <ul className={styles.list}>
       {questions.map(({ id, title, description }) => (
         <li key={id}>
-          <QuestionCard title={title} description={description} />
+          <QuestionCard title={title} description={description} id={id} />
         </li>
       ))}
     </ul>
