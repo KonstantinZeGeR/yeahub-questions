@@ -6,6 +6,7 @@ import { useDebounce } from "../../hooks/useDebounce";
 import { getSpecializations } from "../../api/specializations/getSpecializations";
 import { getSkills } from "../../api/skills/getSkills";
 import styles from "./QuestionsPage.module.css";
+import { useSearchParams } from "react-router-dom";
 
 export function QuestionsPage() {
   const [questions, setQuestions] = useState([]);
@@ -13,12 +14,13 @@ export function QuestionsPage() {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
-  const [search, setSearch] = useState("");
   const [specializations, setSpecializations] = useState([]);
-  const [specializationId, setSpecializationId] = useState("");
   const [skills, setSkills] = useState([]);
-  const [selectedSkills, setSelectedSkills] = useState([]);
+  const [searchParams, setSearchParams] = useSearchParams();
 
+  const search = searchParams.get("search") ?? "";
+  const specializationId = searchParams.get("specializationId") ?? "";
+  const selectedSkills = searchParams.getAll("skills");
   const debouncedSearch = useDebounce(search, 300);
   const limit = 10;
   const totalPages = Math.ceil(total / limit);
@@ -55,19 +57,25 @@ export function QuestionsPage() {
       }
     };
     loadQuestions();
-  }, [currentPage, debouncedSearch, specializationId, selectedSkills]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, debouncedSearch, specializationId, selectedSkills.join(",")]);
 
   if (error) {
     return <p>Error: {error.message}</p>;
   }
 
   const toggleSkill = (id) => {
-    if (selectedSkills.includes(id)) {
-      setSelectedSkills(selectedSkills.filter((skillId) => skillId !== id));
-    } else {
-      setSelectedSkills([...selectedSkills, id]);
-    }
-    setCurrentPage(1);
+    const skillId = String(id);
+    setSearchParams((prev) => {
+      const current = prev.getAll("skills");
+      const next = current.includes(skillId)
+        ? current.filter((s) => s !== skillId)
+        : [...current, skillId];
+
+      prev.delete("skills");
+      next.forEach((skillFromUrl) => prev.append("skills", skillFromUrl));
+      return prev;
+    });
   };
 
   return (
@@ -81,8 +89,11 @@ export function QuestionsPage() {
           placeholder="Поиск по вопросам"
           value={search}
           onChange={(e) => {
-            setSearch(e.target.value);
-            setCurrentPage(1);
+            const value = e.target.value;
+            setSearchParams((prev) => {
+              prev.set("search", value);
+              return prev;
+            });
           }}
         />
 
@@ -90,8 +101,15 @@ export function QuestionsPage() {
           className={styles.select}
           value={specializationId}
           onChange={(e) => {
-            setSpecializationId(e.target.value);
-            setCurrentPage(1);
+            const value = e.target.value;
+            setSearchParams((prev) => {
+              if (value) {
+                prev.set("specializationId", value);
+              } else {
+                prev.delete("specializationId");
+              }
+              return prev;
+            });
           }}
         >
           <option value="">Все специализации</option>
@@ -115,7 +133,11 @@ export function QuestionsPage() {
         ))}
       </div>
 
-      {isLoading ? <p>Loading...</p> : <QuestionsList questions={questions} />}
+      {isLoading && questions.length === 0 ? (
+        <p>Loading...</p>
+      ) : (
+        <QuestionsList questions={questions} />
+      )}
 
       <Pagination
         currentPage={currentPage}
