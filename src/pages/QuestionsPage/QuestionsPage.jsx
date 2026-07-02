@@ -12,7 +12,6 @@ export function QuestionsPage() {
   const [questions, setQuestions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [specializations, setSpecializations] = useState([]);
   const [skills, setSkills] = useState([]);
@@ -21,6 +20,7 @@ export function QuestionsPage() {
   const search = searchParams.get("search") ?? "";
   const specializationId = searchParams.get("specializationId") ?? "";
   const selectedSkills = searchParams.getAll("skills");
+  const currentPage = Number(searchParams.get("page") ?? 1);
   const debouncedSearch = useDebounce(search, 300);
   const limit = 10;
   const totalPages = Math.ceil(total / limit);
@@ -58,7 +58,12 @@ export function QuestionsPage() {
     };
     loadQuestions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, debouncedSearch, specializationId, selectedSkills.join(",")]);
+  }, [
+    currentPage,
+    debouncedSearch,
+    specializationId,
+    selectedSkills.join(","),
+  ]);
 
   if (error) {
     return <p>Error: {error.message}</p>;
@@ -74,6 +79,7 @@ export function QuestionsPage() {
 
       prev.delete("skills");
       next.forEach((skillFromUrl) => prev.append("skills", skillFromUrl));
+      prev.set("page", 1);
       return prev;
     });
   };
@@ -92,6 +98,7 @@ export function QuestionsPage() {
             const value = e.target.value;
             setSearchParams((prev) => {
               prev.set("search", value);
+              prev.set("page", 1);
               return prev;
             });
           }}
@@ -108,6 +115,7 @@ export function QuestionsPage() {
               } else {
                 prev.delete("specializationId");
               }
+              prev.set("page", 1)
               return prev;
             });
           }}
@@ -142,7 +150,12 @@ export function QuestionsPage() {
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
-        onPageChange={setCurrentPage}
+        onPageChange={(page) =>
+          setSearchParams((prev) => {
+            prev.set("page", page);
+            return prev;
+          })
+        }
       />
     </div>
   );
