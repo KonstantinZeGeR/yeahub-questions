@@ -7,21 +7,31 @@ import { getSpecializations } from "../../api/specializations/getSpecializations
 import { getSkills } from "../../api/skills/getSkills";
 import styles from "./QuestionsPage.module.css";
 import { useSearchParams } from "react-router-dom";
+import { useFetch } from "../../hooks/useFetch";
 
 export function QuestionsPage() {
-  const [questions, setQuestions] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [total, setTotal] = useState(0);
   const [specializations, setSpecializations] = useState([]);
   const [skills, setSkills] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
-
   const search = searchParams.get("search") ?? "";
   const specializationId = searchParams.get("specializationId") ?? "";
   const selectedSkills = searchParams.getAll("skills");
   const currentPage = Number(searchParams.get("page") ?? 1);
   const debouncedSearch = useDebounce(search, 300);
+
+  const { data, loading, error } = useFetch(
+    () =>
+      getQuestions({
+        page: currentPage,
+        search: debouncedSearch,
+        specializationId,
+        skills: selectedSkills,
+      }),
+    [currentPage, debouncedSearch, specializationId, selectedSkills.join(",")],
+  );
+
+  const questions = data?.data ?? [];
+  const total = data?.total ?? 0;
   const limit = 10;
   const totalPages = Math.ceil(total / limit);
 
@@ -36,34 +46,6 @@ export function QuestionsPage() {
       setSkills(response.data);
     });
   }, []);
-
-  useEffect(() => {
-    const loadQuestions = async () => {
-      setIsLoading(true);
-      try {
-        const response = await getQuestions({
-          page: currentPage,
-          search: debouncedSearch,
-          specializationId,
-          skills: selectedSkills,
-        });
-        setQuestions(response.data);
-        setTotal(response.total);
-      } catch (error) {
-        console.error("Error:", error);
-        setError(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadQuestions();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    currentPage,
-    debouncedSearch,
-    specializationId,
-    selectedSkills.join(","),
-  ]);
 
   if (error) {
     return <p>Error: {error.message}</p>;
@@ -115,7 +97,7 @@ export function QuestionsPage() {
               } else {
                 prev.delete("specializationId");
               }
-              prev.set("page", 1)
+              prev.set("page", 1);
               return prev;
             });
           }}
@@ -141,7 +123,7 @@ export function QuestionsPage() {
         ))}
       </div>
 
-      {isLoading && questions.length === 0 ? (
+      {loading && questions.length === 0 ? (
         <p>Loading...</p>
       ) : (
         <QuestionsList questions={questions} />
