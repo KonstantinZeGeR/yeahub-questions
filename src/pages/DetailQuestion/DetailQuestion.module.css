@@ -1,0 +1,36 @@
+.page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.back {
+  display: inline-block;
+  margin-bottom: 24px;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.card {
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 16px;
+}
+
+.tag {
+  padding: 4px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  font-size: var(--fs-body-sm);
+}
