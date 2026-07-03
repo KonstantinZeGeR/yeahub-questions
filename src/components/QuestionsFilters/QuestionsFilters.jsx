@@ -39,7 +39,7 @@ export function QuestionsFilters({
         {skills.map((skill) => (
           <button
             key={skill.id}
-            className={`${styles.chip} ${selectedSkills.includes(skill.id) ? styles.chipActive : ""}`}
+            className={`${styles.chip} ${selectedSkills.includes(String(skill.id)) ? styles.chipActive : ""}`}
             onClick={() => onToggleSkill(skill.id)}
           >
             {skill.title}
