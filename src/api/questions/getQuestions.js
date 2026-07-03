@@ -14,7 +14,7 @@ export async function getQuestions({
   if (specializationId) {
     params.append("specializationId", specializationId);
   }
-  if (skills) {
+  if (skills.length > 0) {
     skills.forEach((id) => params.append("skills", id));
   }
 
@@ -24,7 +24,7 @@ export async function getQuestions({
   if (!response.ok) {
     throw new Error(`Error: ${response.status}`);
   }
-  
+
   const data = await response.json();
   return data;
 }

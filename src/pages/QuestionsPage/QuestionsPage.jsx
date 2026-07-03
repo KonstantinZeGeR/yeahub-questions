@@ -1,25 +1,38 @@
 import { useEffect, useState } from "react";
 import { getQuestions } from "../../api/questions/getQuestions";
-import { QuestionsList } from "../../features/QuestionsList/QuestionsList";
+import { QuestionsList } from "../../components/QuestionsList/QuestionsList";
 import { Pagination } from "../../components/Pagination/Pagination";
 import { useDebounce } from "../../hooks/useDebounce";
 import { getSpecializations } from "../../api/specializations/getSpecializations";
 import { getSkills } from "../../api/skills/getSkills";
 import styles from "./QuestionsPage.module.css";
+import { useSearchParams } from "react-router-dom";
+import { useFetch } from "../../hooks/useFetch";
+import { QuestionsFilters } from "../../components/QuestionsFilters/QuestionsFilters";
 
 export function QuestionsPage() {
-  const [questions, setQuestions] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [total, setTotal] = useState(0);
-  const [search, setSearch] = useState("");
   const [specializations, setSpecializations] = useState([]);
-  const [specializationId, setSpecializationId] = useState("");
   const [skills, setSkills] = useState([]);
-  const [selectedSkills, setSelectedSkills] = useState([]);
-
+  const [searchParams, setSearchParams] = useSearchParams();
+  const search = searchParams.get("search") ?? "";
+  const specializationId = searchParams.get("specializationId") ?? "";
+  const selectedSkills = searchParams.getAll("skills");
+  const currentPage = Number(searchParams.get("page") ?? 1);
   const debouncedSearch = useDebounce(search, 300);
+
+  const { data, loading, error } = useFetch(
+    () =>
+      getQuestions({
+        page: currentPage,
+        search: debouncedSearch,
+        specializationId,
+        skills: selectedSkills,
+      }),
+    [currentPage, debouncedSearch, specializationId, selectedSkills.join(",")],
+  );
+
+  const questions = data?.data ?? [];
+  const total = data?.total ?? 0;
   const limit = 10;
   const totalPages = Math.ceil(total / limit);
 
@@ -35,92 +48,71 @@ export function QuestionsPage() {
     });
   }, []);
 
-  useEffect(() => {
-    const loadQuestions = async () => {
-      setIsLoading(true);
-      try {
-        const response = await getQuestions({
-          page: currentPage,
-          search: debouncedSearch,
-          specializationId,
-          skills: selectedSkills,
-        });
-        setQuestions(response.data);
-        setTotal(response.total);
-      } catch (error) {
-        console.error("Error:", error);
-        setError(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadQuestions();
-  }, [currentPage, debouncedSearch, specializationId, selectedSkills]);
-
   if (error) {
     return <p>Error: {error.message}</p>;
   }
 
   const toggleSkill = (id) => {
-    if (selectedSkills.includes(id)) {
-      setSelectedSkills(selectedSkills.filter((skillId) => skillId !== id));
-    } else {
-      setSelectedSkills([...selectedSkills, id]);
-    }
-    setCurrentPage(1);
+    const skillId = String(id);
+    setSearchParams((prev) => {
+      const current = prev.getAll("skills");
+      const next = current.includes(skillId)
+        ? current.filter((s) => s !== skillId)
+        : [...current, skillId];
+
+      prev.delete("skills");
+      next.forEach((skillFromUrl) => prev.append("skills", skillFromUrl));
+      prev.set("page", 1);
+      return prev;
+    });
+  };
+
+  const handlePageChange = (page) => {
+    setSearchParams((prev) => {
+      prev.set("page", page);
+      return prev;
+    });
   };
 
   return (
     <div className={styles.page}>
       <h1 className={styles.title}>Вопросы</h1>
       <p className={styles.subtitle}>Всего вопросов: {total}</p>
-      <div className={styles.filters}>
-        <input
-          className={styles.search}
-          type="text"
-          placeholder="Поиск по вопросам"
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setCurrentPage(1);
-          }}
-        />
 
-        <select
-          className={styles.select}
-          value={specializationId}
-          onChange={(e) => {
-            setSpecializationId(e.target.value);
-            setCurrentPage(1);
-          }}
-        >
-          <option value="">Все специализации</option>
-          {specializations.map((spec) => (
-            <option key={spec.id} value={spec.id}>
-              {spec.title}
-            </option>
-          ))}
-        </select>
-      </div>
+      <QuestionsFilters
+        search={search}
+        specializationId={specializationId}
+        selectedSkills={selectedSkills}
+        specializations={specializations}
+        skills={skills}
+        onSearchChange={(value) => {
+          setSearchParams((prev) => {
+            prev.set("search", value);
+            prev.set("page", 1);
+            return prev;
+          });
+        }}
+        onSpecChange={(value) => {
+          setSearchParams((prev) => {
+            if (value) prev.set("specializationId", value);
+            else prev.delete("specializationId");
+            prev.set("page", 1);
+            return prev;
+          });
+        }}
+        onToggleSkill={toggleSkill}
+      />
 
-      <div className={styles.chips}>
-        {skills.map((skill) => (
-          <button
-            key={skill.id}
-            className={`${styles.chip} ${selectedSkills.includes(skill.id) ? styles.chipActive : ""}`}
-            onClick={() => toggleSkill(skill.id)}
-          >
-            {skill.title}
-          </button>
-        ))}
-      </div>
-
-      {isLoading ? <p>Loading...</p> : <QuestionsList questions={questions} />}
+      {loading && questions.length === 0 ? (
+        <p>Loading...</p>
+      ) : (
+        <QuestionsList questions={questions} />
+      )}
 
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
-        onPageChange={setCurrentPage}
+        onPageChange={handlePageChange}
       />
     </div>
   );
