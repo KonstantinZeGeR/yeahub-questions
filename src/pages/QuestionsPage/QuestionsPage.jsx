@@ -86,11 +86,14 @@ export function QuestionsPage() {
         specializations={specializations}
         skills={skills}
         onSearchChange={(value) => {
-          setSearchParams((prev) => {
-            prev.set("search", value);
-            prev.set("page", 1);
-            return prev;
-          });
+          setSearchParams(
+            (prev) => {
+              prev.set("search", value);
+              prev.set("page", 1);
+              return prev;
+            },
+            { replace: true },
+          );
         }}
         onSpecChange={(value) => {
           setSearchParams((prev) => {
