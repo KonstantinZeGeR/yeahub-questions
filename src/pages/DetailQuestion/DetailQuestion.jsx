@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { useFetch } from "../../hooks/useFetch";
 import { getPublicQuestionById } from "../../api/questions/getPublicQuestionById";
+import DOMPurify from "dompurify";
 import styles from "./DetailQuestion.module.css";
 
 export function DetailQuestion() {
@@ -46,10 +47,17 @@ export function DetailQuestion() {
       <p>Автор: {question.createdBy?.username}</p>
       <div className={styles.card}>
         <h2>Краткий ответ</h2>
-        <div dangerouslySetInnerHTML={{ __html: question.shortAnswer }} />
-
+        <div
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(question.shortAnswer),
+          }}
+        />
         <h2>Развёрнутый ответ</h2>
-        <div dangerouslySetInnerHTML={{ __html: question.longAnswer }} />
+        <div
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(question.longAnswer),
+          }}
+        />{" "}
       </div>
     </div>
   );

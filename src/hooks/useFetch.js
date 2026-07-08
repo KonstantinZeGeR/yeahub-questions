@@ -6,18 +6,23 @@ export function useFetch(fetcher, deps = []) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    let ignore = false;
     const load = async () => {
       setLoading(true);
       setError(null);
       try {
-        setData(await fetcher());
+        const result = await fetcher();
+        if (!ignore) setData(result);
       } catch (err) {
-        setError(err);
+        if (!ignore) setError(err);
       } finally {
-        setLoading(false);
+        if (!ignore) setLoading(false);
       }
     };
     load();
+    return () => {
+      ignore = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
