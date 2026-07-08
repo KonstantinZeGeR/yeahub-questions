@@ -17,7 +17,7 @@ export function QuestionsPage() {
   const search = searchParams.get("search") ?? "";
   const specializationId = searchParams.get("specializationId") ?? "";
   const selectedSkills = searchParams.getAll("skills");
-  const currentPage = Number(searchParams.get("page") ?? 1);
+  const currentPage = Number(searchParams.get("page")) || 1;
   const debouncedSearch = useDebounce(search, 300);
 
   const { data, loading, error } = useFetch(
@@ -37,15 +37,15 @@ export function QuestionsPage() {
   const totalPages = Math.ceil(total / limit);
 
   useEffect(() => {
-    getSpecializations().then((response) => {
-      setSpecializations(response.data);
-    });
+    getSpecializations()
+      .then((response) => setSpecializations(response.data))
+      .catch((error) => console.error("Специализация:", error));
   }, []);
 
   useEffect(() => {
-    getSkills().then((response) => {
-      setSkills(response.data);
-    });
+    getSkills()
+      .then((response) => setSkills(response.data))
+      .catch((error) => console.error("Навыки:", error));
   }, []);
 
   if (error) {
@@ -55,22 +55,24 @@ export function QuestionsPage() {
   const toggleSkill = (id) => {
     const skillId = String(id);
     setSearchParams((prev) => {
-      const current = prev.getAll("skills");
-      const next = current.includes(skillId)
+      const next = new URLSearchParams(prev);
+      const current = next.getAll("skills");
+      const updated = current.includes(skillId)
         ? current.filter((s) => s !== skillId)
         : [...current, skillId];
 
-      prev.delete("skills");
-      next.forEach((skillFromUrl) => prev.append("skills", skillFromUrl));
-      prev.set("page", 1);
-      return prev;
+      next.delete("skills");
+      updated.forEach((skillFromUrl) => next.append("skills", skillFromUrl));
+      next.set("page", 1);
+      return next;
     });
   };
 
   const handlePageChange = (page) => {
     setSearchParams((prev) => {
-      prev.set("page", page);
-      return prev;
+      const next = new URLSearchParams(prev);
+      next.set("search", page);
+      return next;
     });
   };
 
@@ -88,19 +90,21 @@ export function QuestionsPage() {
         onSearchChange={(value) => {
           setSearchParams(
             (prev) => {
-              prev.set("search", value);
-              prev.set("page", 1);
-              return prev;
+              const next = new URLSearchParams(prev);
+              next.set("search", value);
+              next.set("page", 1);
+              return next;
             },
             { replace: true },
           );
         }}
         onSpecChange={(value) => {
           setSearchParams((prev) => {
-            if (value) prev.set("specializationId", value);
-            else prev.delete("specializationId");
-            prev.set("page", 1);
-            return prev;
+            const next = new URLSearchParams(prev);
+            if (value) next.set("specializationId", value);
+            else next.delete("specializationId");
+            next.set("page", 1);
+            return next;
           });
         }}
         onToggleSkill={toggleSkill}
